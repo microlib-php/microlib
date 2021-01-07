@@ -29,7 +29,9 @@ class User
     {
         if (is_dir('./state')) {
             if ($state) file_put_contents('./state/' . $this->id, $state);
-            else unlink('./state/' . $this->id);
+            else{
+                if(file_exists('./state/' . $this->id)) unlink('./state/' . $this->id);
+            }
         } else {
             mkdir('./state');
             file_put_contents('./state/' . $this->id, $state);
@@ -60,7 +62,9 @@ class User
     {
         if (is_dir('./state')) {
             if ($state) file_put_contents('./state/' . $id, $state);
-            else unlink('./state/' . $id);
+            else{
+                if(file_exists('./state/' . $id)) unlink('./state/' . $id);
+            }
         } else {
             mkdir('./state');
             file_put_contents('./state/' . $id, $state);
