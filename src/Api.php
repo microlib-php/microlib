@@ -22,7 +22,7 @@ class Api
         $this->token = $token;
     }
 
-    protected function request($method, $data)
+    protected function request($method, $data = [])
     {
         $url = "https://api.telegram.org/bot" . $this->token . '/' . $method;
         $ch = curl_init($url);
@@ -134,14 +134,24 @@ class Api
         return $this->request('editMessagereplymarkup', $data);
     }
 
-    function get_chat_member($chat_id,$user_id){
-        $data = [
-            'chat_id'=>$chat_id,
-            'user_id'=>$user_id
-        ];
-        return $this->request('getChatmember',$data);
+    function get_me()
+    {
+        return $this->request("getMe");
     }
 
+    function get_webhook_info()
+    {
+        return $this->request("getWebhookInfo");
+    }
+
+    function get_chat_member($chat_id, $user_id)
+    {
+        $data = [
+            'chat_id' => $chat_id,
+            'user_id' => $user_id
+        ];
+        return $this->request('getChatmember', $data);
+    }
 
     function keyboard($buttons, $size = 1)
     {

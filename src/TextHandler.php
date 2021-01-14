@@ -18,7 +18,7 @@ class TextHandler implements Handler
         $this->api = $api;
     }
 
-    public function process($message,$state=null)
+    public function process($message, $state = null)
     {
     }
 }

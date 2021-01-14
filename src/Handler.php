@@ -11,5 +11,5 @@ namespace lib;
 
 interface Handler
 {
-    public function process($update,$state=null);
+    public function process($update, $state = null);
 }
