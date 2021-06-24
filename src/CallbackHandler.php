@@ -8,12 +8,11 @@
 
 namespace lib;
 
-
 class CallbackHandler
 {
     protected $api;
 
-    function __construct(Api $api)
+    public function __construct(Api $api)
     {
         $this->api = $api;
     }

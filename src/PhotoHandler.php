@@ -9,7 +9,7 @@
 namespace lib;
 
 
-class PhotoHandler implements Handler
+class PhotoHandler
 {
     protected $api;
 

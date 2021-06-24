@@ -44,7 +44,7 @@ class User
      */
     public function get_state()
     {
-        return file_get_contents('./state/' . $this->id);
+        return file_exists('./state/' . $this->id) ? file_get_contents('./state/' . $this->id) : false;
     }
 
     /*

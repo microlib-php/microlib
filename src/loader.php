@@ -6,7 +6,10 @@
  * Time: 20:23
  */
 
-
-foreach (glob('./src/*.php') as $file) {
-    if ($file != './src/loader.php') require_once $file;
-}
+require_once __DIR__ . "/Api.php";
+require_once __DIR__ . "/User.php";
+require_once __DIR__ . "/TextHandler.php";
+require_once __DIR__ . "/PhotoHandler.php";
+require_once __DIR__ . "/CallbackHandler.php";
+require_once __DIR__ . "/AudioHandler.php";
+require_once __DIR__ . "/InlineHandler.php";

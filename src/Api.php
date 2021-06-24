@@ -8,7 +8,6 @@
 
 namespace lib;
 
-
 class Api
 {
     protected $token;
@@ -16,13 +15,15 @@ class Api
     public $text_handlers = [];
     public $callback_handlers = [];
     public $photo_handlers = [];
+    public $audio_handlers = [];
+    public $inline_handlers = [];
 
-    function __construct($token)
+    public function __construct($token)
     {
         $this->token = $token;
     }
 
-    protected function request($method, $data = [])
+    protected function _request($method, $data = [])
     {
         $url = "https://api.telegram.org/bot" . $this->token . '/' . $method;
         $ch = curl_init($url);
@@ -37,48 +38,69 @@ class Api
         return json_decode($res);
     }
 
-
     public function answer_callback_query($query_id, $text = null, $show_alert = false, $url = null)
     {
         $data = [
             'callback_query_id' => $query_id,
             'text' => $text,
-            'show_alert' => $show_alert
+            'show_alert' => $show_alert,
         ];
-        if ($url) $data['url'] = $url;
-        return $this->request('answerCallbackQuery', $data);
+        if ($url) {
+            $data['url'] = $url;
+        }
+
+        return $this->_request('answerCallbackQuery', $data);
+    }
+
+    function answer_inline_query(
+        $inline_query_id,
+        $results = [],
+        $switch_pm_text = null,
+        $switch_pm_parameter = null
+    )
+    {
+        $data = [
+            'inline_query_id' => $inline_query_id,
+            'results' => $results
+        ];
+        if ($switch_pm_text) $data['switch_pm_text'] = $switch_pm_text;
+        if ($switch_pm_parameter) $data['switch_pm_parameter'] = $switch_pm_parameter;
+        return $this->_request('answerInlineQuery', $data);
     }
 
     public function delete_message($chat_id, $message_id)
     {
         $data = [
             'chat_id' => $chat_id,
-            'message_id' => $message_id
+            'message_id' => $message_id,
         ];
-        return $this->request('deleteMessage', $data);
+        return $this->_request('deleteMessage', $data);
     }
-
 
     public function send_message(
         $chat_id,
         $text,
         $reply_markup = null,
-        $parse_mode = null)
+        $parse_mode = null,
+        $extra = [])
     {
         $data = [
             'chat_id' => $chat_id,
             'text' => $text,
             'parse_mode' => $parse_mode,
             'reply_markup' => $reply_markup];
-        return $this->request('sendMessage', $data);
+        if (!empty($extra)) $data = array_merge($data, $extra);
+        return $this->_request('sendMessage', $data);
     }
+
 
     public function send_photo(
         $chat_id,
         $photo,
         $caption = '',
         $reply_markup = null,
-        $parse_mode = null)
+        $parse_mode = null,
+        $extra = [])
     {
         $data = [
             'chat_id' => $chat_id,
@@ -86,7 +108,8 @@ class Api
             'caption' => $caption,
             'parse_mode' => $parse_mode,
             'reply_markup' => $reply_markup];
-        return $this->request('sendPhoto', $data);
+        if (!empty($extra)) $data = array_merge($data, $extra);
+        return $this->_request('sendPhoto', $data);
     }
 
     public function send_document(
@@ -94,7 +117,8 @@ class Api
         $document,
         $caption = '',
         $reply_markup = null,
-        $parse_mode = null)
+        $parse_mode = null,
+        $extra = [])
     {
         $data = [
             'chat_id' => $chat_id,
@@ -102,16 +126,36 @@ class Api
             'caption' => $caption,
             'parse_mode' => $parse_mode,
             'reply_markup' => $reply_markup];
-        return $this->request('sendDocument', $data);
+        if (!empty($extra)) $data = array_merge($data, $extra);
+        return $this->_request('sendDocument', $data);
     }
 
+    public function send_audio(
+        $chat_id,
+        $audio,
+        $caption = '',
+        $reply_markup = null,
+        $parse_mode = null,
+        $extra = []
+    )
+    {
+        $data = [
+            'chat_id' => $chat_id,
+            'audio' => $audio,
+            'caption' => $caption,
+            'parse_mode' => $parse_mode,
+            'reply_markup' => $reply_markup];
+        if (!empty($extra)) $data = array_merge($data, $extra);
+        return $this->_request('sendAudio', $data);
+    }
 
     public function edit_message_text(
         $chat_id,
         $message_id,
         $text,
         $reply_markup = null,
-        $parse_mode = null)
+        $parse_mode = null,
+        $extra = [])
     {
         $data = [
             'chat_id' => $chat_id,
@@ -119,7 +163,8 @@ class Api
             'text' => $text,
             'parse_mode' => $parse_mode,
             'reply_markup' => $reply_markup];
-        return $this->request('editMessageText', $data);
+        if (!empty($extra)) $data = array_merge($data, $extra);
+        return $this->_request('editMessageText', $data);
     }
 
     public function edit_message_reply_markup(
@@ -131,29 +176,32 @@ class Api
             'chat_id' => $chat_id,
             'message_id' => $message_id,
             'reply_markup' => $reply_markup];
-        return $this->request('editMessagereplymarkup', $data);
+        return $this->_request('editMessagereplymarkup', $data);
     }
 
-    function get_me()
+    public function get_me()
     {
-        return $this->request("getMe");
+        return $this->_request("getMe");
     }
 
-    function get_webhook_info()
+    public function get_webhook_info()
     {
-        return $this->request("getWebhookInfo");
+        return $this->_request("getWebhookInfo");
     }
 
-    function get_chat_member($chat_id, $user_id)
+    public function get_chat_member($chat_id, $user_id)
     {
         $data = [
             'chat_id' => $chat_id,
-            'user_id' => $user_id
+            'user_id' => $user_id,
         ];
-        return $this->request('getChatmember', $data);
+        return $this->_request('getChatmember', $data);
     }
 
-    function keyboard($buttons, $size = 1)
+
+    //additional tools and handlers section
+
+    public function keyboard($buttons, $size = 1)
     {
         $keyboard = [
             'keyboard' => [],
@@ -166,7 +214,7 @@ class Api
         return json_encode($keyboard);
     }
 
-    function callback_keyboard($texts, $callback_data, $size = 1)
+    public function callback_keyboard($texts, $callback_data, $size = 1)
     {
         $keyboard = [
             'inline_keyboard' => []];
@@ -186,23 +234,32 @@ class Api
      * @param $handler
      * @param bool $state
      */
-    function onText($regex, $handler, $state = false)
+    public function onText($regex, $handler, $state = false)
     {
         $this->text_handlers[] = ['regex' => $regex, 'handler' => $handler, 'state' => $state];
     }
 
-    function onPhoto($handler, $state = false)
+    public function onPhoto($handler, $state = false)
     {
         $this->photo_handlers[] = ['handler' => $handler, 'state' => $state];
     }
 
-    function onCallback($regex, $handler, $state = false)
+    public function onCallback($regex, $handler, $state = false)
     {
         $this->callback_handlers[] = ['regex' => $regex, 'handler' => $handler, 'state' => $state];
     }
 
+    public function onAudio($handler, $state = false)
+    {
+        $this->audio_handlers[] = ['handler' => $handler, 'state' => $state];
+    }
 
-    function webhook()
+    public function onInlineQuery($regex, $handler)
+    {
+        $this->inline_handlers[] = ['regex' => $regex, 'handler' => $handler];
+    }
+
+    public function webhook()
     {
         $update = json_decode(file_get_contents('php://input'), true);
         if (isset($update['message'])) {
@@ -229,7 +286,7 @@ class Api
                         }
                     }
                 }
-            }
+            } //end of handling text messages
 
             //handling photo messages
             if (isset($update['message']['photo'])) {
@@ -242,7 +299,7 @@ class Api
                         $state = User::get_state_byId($update['message']['chat']['id']);
                         if (preg_match("#" . $handler['state'] . "#", $state)) {
                             $handle = new $handler['handler']($this);
-                            $handle->process($update['message']);
+                            $handle->process($update['message'],$state);
                         } else {
                             continue;
                         }
@@ -252,11 +309,11 @@ class Api
                     }
 
                 }
-            }
+            } //end of handling photos
 
         }
 
-
+        //starting handling of callback queries
         if (isset($update['callback_query'])) {
             $data = $update['callback_query']['data'];
             foreach ($this->callback_handlers as $handler) {
@@ -268,7 +325,7 @@ class Api
                         $state = User::get_state_byId($update['callback_query']['from']['id']);
                         if (preg_match("#" . $handler['state'] . "#", $state)) {
                             $handle = new $handler['handler']($this);
-                            $handle->process($update['callback_query']);
+                            $handle->process($update['callback_query'],$state);
                         } else {
                             continue;
                         }
@@ -279,8 +336,46 @@ class Api
                 }
             }
 
-        }
+        } //end of handling callbacks
 
+        //handling audio messages
+        if (isset($update['message']['audio'])) {
+            $photo = $update['message']['audio'];
+            foreach ($this->audio_handlers as $handler) {
+                /**
+                 * @var AudioHandler $handle
+                 */
+                if ($handler['state']) {
+                    $state = User::get_state_byId($update['message']['chat']['id']);
+                    if (preg_match("#" . $handler['state'] . "#", $state)) {
+                        $handle = new $handler['handler']($this);
+                        $handle->process($update['message']);
+                    } else {
+                        continue;
+                    }
+                } else {
+                    $handle = new $handler['handler']($this);
+                    $handle->process($update['message']);
+                }
+
+            }
+        } //end of handling audios
+
+
+        //handling inline queries
+        if (isset($update['inline_query'])) {
+            $query = $update['inline_query'];
+            foreach ($this->inline_handlers as $handler) {
+                /**
+                 * @var InlineHandler $handle
+                 */
+                $handle = new $handler['handler']($this);
+                $handle->process($update['inline_query']);
+
+            }
+        } //end of handling inline queries
+
+        echo 'ok';
     }
 
 }

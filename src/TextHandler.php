@@ -9,7 +9,7 @@
 namespace lib;
 
 
-class TextHandler implements Handler
+class TextHandler
 {
     protected $api;
 
