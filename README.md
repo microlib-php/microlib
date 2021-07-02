@@ -3,5 +3,7 @@
 
 Echo bot examle [bu yerda](https://github.com/microlib-php/examples)
 
+Telegram kanalmizga qo'shiling [@Microlib](https://t.me/Microlib)
+
 Yaratuvchi: [Samandar Murodjonov](https://t.me/Kakashi_Xatake) | Telegram kanal [@Makkapoya](https://t.me/makkapoya)
 ------------ | -------------
