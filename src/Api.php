@@ -16,6 +16,7 @@ class Api
     public $callback_handlers = [];
     public $photo_handlers = [];
     public $audio_handlers = [];
+    public $document_handlers = [];
     public $inline_handlers = [];
 
     public function __construct($token)
@@ -254,6 +255,11 @@ class Api
         $this->audio_handlers[] = ['handler' => $handler, 'state' => $state];
     }
 
+    public function onDocument($handler, $state = false)
+    {
+        $this->document_handlers[] = ['handler' => $handler, 'state' => $state];
+    }
+
     public function onInlineQuery($regex, $handler)
     {
         $this->inline_handlers[] = ['regex' => $regex, 'handler' => $handler];
@@ -290,7 +296,6 @@ class Api
 
             //handling photo messages
             if (isset($update['message']['photo'])) {
-                $photo = $update['message']['photo'];
                 foreach ($this->photo_handlers as $handler) {
                     /**
                      * @var PhotoHandler $handle
@@ -312,6 +317,51 @@ class Api
             } //end of handling photos
 
         }
+
+
+        //handling audio messages
+        if (isset($update['message']['audio'])) {
+            foreach ($this->audio_handlers as $handler) {
+                /**
+                 * @var AudioHandler $handle
+                 */
+                if ($handler['state']) {
+                    $state = User::get_state_byId($update['message']['chat']['id']);
+                    if (preg_match("#" . $handler['state'] . "#", $state)) {
+                        $handle = new $handler['handler']($this);
+                        $handle->process($update['message'],$state);
+                    } else {
+                        continue;
+                    }
+                } else {
+                    $handle = new $handler['handler']($this);
+                    $handle->process($update['message']);
+                }
+
+            }
+        } //end of handling audios
+
+        //handling documents
+        if (isset($update['message']['document'])) {
+            foreach ($this->document_handlers as $handler) {
+                /**
+                 * @var DocumentHandler $handle
+                 */
+                if ($handler['state']) {
+                    $state = User::get_state_byId($update['message']['chat']['id']);
+                    if (preg_match("#" . $handler['state'] . "#", $state)) {
+                        $handle = new $handler['handler']($this);
+                        $handle->process($update['message'], $state);
+                    } else {
+                        continue;
+                    }
+                } else {
+                    $handle = new $handler['handler']($this);
+                    $handle->process($update['message']);
+                }
+
+            }
+        } //end of handling documents
 
         //starting handling of callback queries
         if (isset($update['callback_query'])) {
@@ -337,30 +387,6 @@ class Api
             }
 
         } //end of handling callbacks
-
-        //handling audio messages
-        if (isset($update['message']['audio'])) {
-            $photo = $update['message']['audio'];
-            foreach ($this->audio_handlers as $handler) {
-                /**
-                 * @var AudioHandler $handle
-                 */
-                if ($handler['state']) {
-                    $state = User::get_state_byId($update['message']['chat']['id']);
-                    if (preg_match("#" . $handler['state'] . "#", $state)) {
-                        $handle = new $handler['handler']($this);
-                        $handle->process($update['message']);
-                    } else {
-                        continue;
-                    }
-                } else {
-                    $handle = new $handler['handler']($this);
-                    $handle->process($update['message']);
-                }
-
-            }
-        } //end of handling audios
-
 
         //handling inline queries
         if (isset($update['inline_query'])) {

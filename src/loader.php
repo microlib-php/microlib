@@ -13,3 +13,4 @@ require_once __DIR__ . "/PhotoHandler.php";
 require_once __DIR__ . "/CallbackHandler.php";
 require_once __DIR__ . "/AudioHandler.php";
 require_once __DIR__ . "/InlineHandler.php";
+require_once __DIR__ . "/DocumentHandler.php";
