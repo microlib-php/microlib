@@ -81,7 +81,7 @@ class Api
             'chat_id' => $chat_id,
             'from_chat_id' => $from_chat_id,
             'message_id' => $message_id,
-            'parse_mode' => $parse_mode
+            'parse_mode' => $parse_mode,
             'reply_markup' => $reply_markup];
         if (!empty($extra)) $data = array_merge($data, $extra);
         return $this->_request('copyMessage', $data);
