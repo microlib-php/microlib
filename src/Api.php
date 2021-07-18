@@ -69,6 +69,26 @@ class Api
         return $this->_request('answerInlineQuery', $data);
     }
 
+    public function copy_message(
+        $chat_id,
+        $from_chat_id,
+        $message_id,
+        $reply_markup = null,
+        $parse_mode = null,
+        $caption = null,
+        $extra = [])
+    {
+        $data = [
+            'chat_id' => $chat_id,
+            'from_chat_id' => $from_chat_id,
+            'message_id' => $message_id,
+            'parse_mode' => $parse_mode,
+            'caption' => $caption,
+            'reply_markup' => $reply_markup];
+        if (!empty($extra)) $data = array_merge($data, $extra);
+        return $this->_request('copyMessage', $data);
+    }
+
     public function delete_message($chat_id, $message_id)
     {
         $data = [
@@ -304,7 +324,7 @@ class Api
                         $state = User::get_state_byId($update['message']['chat']['id']);
                         if (preg_match("#" . $handler['state'] . "#", $state)) {
                             $handle = new $handler['handler']($this);
-                            $handle->process($update['message'],$state);
+                            $handle->process($update['message'], $state);
                         } else {
                             continue;
                         }
@@ -329,7 +349,7 @@ class Api
                     $state = User::get_state_byId($update['message']['chat']['id']);
                     if (preg_match("#" . $handler['state'] . "#", $state)) {
                         $handle = new $handler['handler']($this);
-                        $handle->process($update['message'],$state);
+                        $handle->process($update['message'], $state);
                     } else {
                         continue;
                     }
@@ -375,7 +395,7 @@ class Api
                         $state = User::get_state_byId($update['callback_query']['from']['id']);
                         if (preg_match("#" . $handler['state'] . "#", $state)) {
                             $handle = new $handler['handler']($this);
-                            $handle->process($update['callback_query'],$state);
+                            $handle->process($update['callback_query'], $state);
                         } else {
                             continue;
                         }
