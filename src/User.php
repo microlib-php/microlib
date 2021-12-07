@@ -12,8 +12,8 @@ namespace lib;
 class User
 {
 
-    public $id;
-    public $username = Null;
+    public int $id;
+    public ?string $username = Null;
 
     function __construct($id)
     {
