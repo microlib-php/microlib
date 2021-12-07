@@ -27,14 +27,17 @@ class User
      */
     public function set_state($state = false)
     {
-        if (is_dir('./state')) {
+        if(is_dir('./state')) {
             if ($state) file_put_contents('./state/' . $this->id, $state);
             else {
                 if (file_exists('./state/' . $this->id)) unlink('./state/' . $this->id);
             }
         } else {
             mkdir('./state');
-            file_put_contents('./state/' . $this->id, $state);
+            if ($state) file_put_contents('./state/' . $this->id, $state);
+            else {
+                if (file_exists('./state/' . $this->id)) unlink('./state/' . $this->id);
+            }
         }
     }
 
